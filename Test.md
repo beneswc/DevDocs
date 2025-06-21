@@ -1,2 +1,2 @@
 # test
-![image](Images\Image_1.png)
+![image](Images/Image_1.png)
