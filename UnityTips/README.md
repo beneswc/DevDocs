@@ -13,6 +13,7 @@
 - [编辑器拓展](#编辑器拓展)
 - [资源管理](#资源管理)
 - [动画](#动画)
+- [异步任务](#异步任务)
 ## 命名
 在 Unity 开发中，我们遵循一套行业广泛认可的命名约定，主要是基于微软的 C# 命名指南。
 - 类、结构体、枚举、方法、公开成员使用 `PascalCase` 命名，所有单词首字母大写（例如 `PlayerController`）。
@@ -614,7 +615,7 @@ _runAnimation.Events.Add(0.5f, () => Debug.Log("The running animation is halfway
 // 播放动画，0.25f 是过渡时间
 _animancer.Play(_runAnimation, 0.25f);
 ```
-## 异步编程
+## 异步任务
 使用 UniTask 执行异步任务，UniTask 是一个为 Unity 专门设计和优化的、高性能的开源异步解决方案。它旨在完全取代协程和在 Unity 中直接使用 `Task`。它基于 struct 设计，几乎没有内存分配。
 
 协程无法直接返回一个值 (IEnumerator 的返回类型是固定的)。你需要通过回调函数或引用传参等笨拙的方式来获取结果。UniTask 使用 UniTask<T>，可以像普通函数一样自然地 return 结果。
