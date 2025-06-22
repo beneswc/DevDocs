@@ -15,10 +15,10 @@
 - [动画](#动画)
 - [异步任务](#异步任务)
 ## 命名
-在 Unity 开发中，我们遵循一套行业广泛认可的命名约定，主要是基于微软的 C# 命名指南。
-- 类、结构体、枚举、方法、公开成员使用 `PascalCase` 命名，所有单词首字母大写（例如 `PlayerController`）。
-- 接口使用 `PascalCase` 命名，前缀加 `I` 表示这是一个接口（例如 `IPlayerController`）。
-- 局部变量与方法参数使用 `camelCase` 命名，第一个单词的首字母小写（例如 `playerCount`）。
+行业广泛认可的命名约定主要是基于微软的 C# 命名指南。
+- 类、结构体、枚举、方法和公开成员使用 `PascalCase` （帕斯卡命名法）命名，所有单词首字母大写（例如 `PlayerController` ）。
+- 接口使用 `PascalCase` 命名，前缀加 `I` 表示这是一个接口（例如 `IPlayerController` ）。
+- 局部变量与方法参数使用 `camelCase`（驼峰命名法）命名，第一个单词的首字母小写（例如 `playerCount` ）。
 - 私有字段使用 `_camelCase` 命名，表示这是一个成员变量，与方法参数区分。
 
     ```csharp
@@ -30,14 +30,17 @@
 不使用拼音命名，中文里同音字太多了，`jiNeng` 到底是 “技能” 还是 “机能” ？`shiYong` 是 “使用” 还是 “试用” ？这种歧义会给阅读者带来困惑。
 ```csharp
 // 使用英文命名，且名称应具有描述性
-public void Attack(int damage);
+public void Attack(float damage) 
+{
+    // 处理攻击逻辑……
+}
 ```
 ## 访问修饰符
-根据需要设置成员的访问修饰符，而不是将所有成员都设置为 `public`。
+根据需要设置成员的访问修饰符，而不是将所有成员都设置为 `public` 。
 
-把所有东西都设为 `public`，相当于把你家的所有房门、抽屉、保险箱全部敞开，钥匙还挂在门上。 短期内你拿东西确实方便了，但长期来看，整个家会乱成一团，东西会莫名其妙地丢失或损坏。
+把所有东西都设为 `public` ，相当于把你家的所有房门、抽屉、保险箱全部敞开，钥匙还挂在门上。 短期内你拿东西确实方便了，但长期来看整个家会乱成一团，东西会莫名其妙地丢失或损坏。
 
-外部代码可以随意调用和修改类的状态，可能导致意想不到的 Bug 或安全隐患。例如，一些只供内部调用的辅助方法被外部直接调用，可能导致程序逻辑异常。
+外部代码可以随意调用和修改类的状态，可能导致意想不到的 Bug 或安全隐患。例如一些只供内部调用的辅助方法被外部直接调用，可能导致程序逻辑异常。
 ```csharp
 public bool TryMove(Vector3 position)
 {
@@ -51,10 +54,10 @@ public bool TryMove(Vector3 position)
 // 不应允许外部直接调用
 public void MoveTo(Vector3 position) 
 {
-    // 移动物体
+    // 移动物体……
 }
 ```
-将方法修改为 `private` 或 `protected` , 外部调用时只需要考虑调用 `public` 方法，而不会被其他内部方法干扰导致调用错误。
+将方法修改为 `private` 或 `protected` ，外部调用时只需要考虑调用 `public` 方法，不会与其他内部方法混淆。
 ```csharp
 // 不需要判断调用 TryMove 还是 MoveTo
 public bool TryMove(Vector3 position)
@@ -68,14 +71,14 @@ public bool TryMove(Vector3 position)
 
 protected void MoveTo(Vector3 position) 
 {
-    // 移动物体
+    // 移动物体……
 }
 ```
-尽量不将字段设为 `public` 供外部调用。例如你有一个 `public float Speed` 字段在你的 `PlayerController` 脚本里。项目初期，很多脚本都直接这样用：`player.Speed = 10f` 。
+尽量不将字段设为 `public` 供外部使用。例如你有一个 `public float Speed` 字段在你的 `PlayerController` 脚本里。项目初期很多脚本都直接这样用：`player.Speed = 10f` 。
 
-几个月后，产品经理要求：当玩家速度改变时，需要同时更新 `Animator` 的 `speed` 参数，并播放一个加速的音效。
+几个月后，产品经理要求：当玩家速度改变时，需要同时更新加速动画，并播放一个加速的音效。
 
-现在你头大了，因为 `speed` 是 `public` 的，你必须找到项目中所有直接给 `player.speed` 赋值的地方，然后在每一处都加上更新动画和播放音效的代码。这绝对是一场噩梦，而且很容易遗漏。
+现在你头大了，因为 `Speed` 是 `public` 的，你必须找到项目中所有直接给 `player.Speed` 赋值的地方，然后在每一处都加上更新动画和播放音效的代码。这绝对是一场噩梦，而且很容易遗漏。
 
 如果一开始就用属性或方法来封装它，你只需要修改一处地方：
 ```csharp
@@ -91,7 +94,7 @@ public float Speed
     get => _speed;
 }
 ```
-很多 Unity 开发者用 `public` 的唯一目的，就是为了能在 Inspector 面板里看到并调整这个变量。这是一个非常普遍的误解。
+很多 Unity 开发者用 `public` 字段的唯一目的，就是为了能在 Inspector 面板里看到并调整这个变量。这是一个非常普遍的误解。
 
 正确的做法是使用 `SerializeField` 特性：
 ```csharp
@@ -106,47 +109,46 @@ public float FireRate => _fireRate;
 你在读一段代码，如果它是一条笔直的大路，你一眼就能看到头。但如果它是一个有着无数岔路和地下室的迷宫呢？
 ```csharp
 // 典型的 “意大利面条式” 代码，或者叫 “箭头代码”
-void SomeFunction()
+public void SomeFunction()
 {
     if (conditionA)
     {
-        // ... 一些代码 ...
+        // 一些代码……
         if (conditionB)
         {
-            // ... 更多代码 ...
+            // 更多代码……
             for (int i = 0; i < 10; i++)
             {
                 if (conditionC)
                 {
-                    // ... 救命，我在哪？...
+                    // 我在哪？
                     if (conditionD)
                     {
-                        // ... 别看了，你自己都写不出这么烂的代码 ...
-                        // 真正的逻辑在这里
+                        // 真正的逻辑在这里……
                     }
                 }
             }
         }
         else
         {
-            // ... conditionB 的 else 分支在这里，你还记得 conditionA 是什么吗？ ...
+            // conditionB 的 else 分支在这里，你还记得 conditionA 是什么吗？
         }
     }
 }
 ```
-每多一层嵌套，你的大脑就需要多记住一个上下文条件。读到最内层时，你必须同时记住 `conditionA`、`conditionB`、`i` 的值以及 `conditionC` 都为 true。这极大地增加了理解代码的 “认知负担”。
+每多一层嵌套，你的大脑就需要多记住一个上下文条件。读到最内层时，你必须同时记住 `conditionA`、`conditionB`、`i` 的值以及 `conditionC` 都为 `true` 。这极大地增加了理解代码的 “认知负担” 。
 
 需求变更了，要在这个逻辑里加一个 `conditionE` 怎么办？或者要修改 `conditionB` 为 `false` 时的逻辑？你得像拆弹专家一样，小心翼翼地找到对应的 `if else` 代码块，任何一个大括号的错位都可能引发雪崩式的 Bug。
 
-逻辑如此复杂，非常容易在某个分支里漏掉一些情况，或者写出错误的处理。比如，你可能在某个内层 `if` 里修改了一个变量，却忘了在外层 `else` 里把它重置回来。这种 Bug 极难调试，因为你需要模拟一套非常特定的条件才能复现它。
+逻辑如此复杂，非常容易在某个分支里漏掉一些情况，或者写出错误的处理。比如你可能在某个内层 `if` 里修改了一个变量，却忘了在外层 `else` 里把它重置回来。这种 Bug 极难调试，因为你需要模拟一套非常特定的条件才能复现它。
 
-嵌套最深处的那段核心逻辑，被层层 “包裹”，你根本无法把它抽出来给别的地方用。它和外部的条件焊死在了一起。
+嵌套最深处的那段核心逻辑被层层 “包裹” ，你根本无法把它抽出来给别的地方用。它和外部的条件焊死在了一起。
 
-提早返回是最简单、最常用、最有效的一招。与其用一个大的 `if` 包住所有正常逻辑，不如先处理掉所有的异常或特殊情况，然后直接 `return` 或 `continue`。
+提早返回是最简单且有效的一招。与其用一个大的 `if` 包住所有正常逻辑，不如先处理掉所有的异常或特殊情况，然后直接 `return` 或 `continue`。
 
 大量嵌套：
 ```csharp 
-void PlayerAttack(Enemy target)
+public void PlayerAttack(Enemy target)
 {
     if (player.IsAlive)
     {
@@ -166,7 +168,7 @@ void PlayerAttack(Enemy target)
 ```
 使用提早返回：
 ```csharp
-void PlayerAttack(Enemy target)
+public void PlayerAttack(Enemy target)
 {
     // 一系列 “哨兵” 检查，不满足条件就直接 “滚蛋”
     if (!player.IsAlive) return;
@@ -182,32 +184,32 @@ void PlayerAttack(Enemy target)
 
 所有功能在 `Update` 里一锅炖：
 ```csharp
-void Update()
+private void Update()
 {
-    // --- 处理玩家移动 ---
+    // 处理玩家移动
     if (Input.GetKey(KeyCode.W))
     {
-        // ... 一大堆移动计算代码 ...
-        // ... 动画状态更新 ...
+        // 一大堆移动计算代码……
+        // 动画状态更新……
     }
 
-    // --- 处理玩家攻击 ---
+    // 处理玩家攻击
     if (Input.GetKeyDown(KeyCode.Mouse0))
     {
-        // ... 一大堆射线检测、寻找目标的代码 ...
-        // ... 调用攻击逻辑 ...
+        // 一大堆射线检测、寻找目标的代码……
+        // 调用攻击逻辑……
     }
 
-    // --- 处理血量恢复 ---
+    // 处理血量恢复
     if (health < maxHealth)
     {
-        // ... 计时器、回血逻辑 ...
+        // 计时器、回血逻辑……
     }
 }
 ```
 将功能提取为新的方法，逻辑清晰：
 ```csharp
-void Update()
+private void Update()
 {
     HandleMovement();
     HandleAttack();
@@ -236,80 +238,84 @@ private void HandleHealthRegeneration()
 }
 ```
 ## 类
-一个类不应承担过多的职责，例如你正在开发一个玩家角色，你创建了一个 `Player` 脚本。一开始，你可能觉得把所有逻辑都放在这里很方便：
+一个类不应承担过多的职责。例如你正在开发一个玩家角色，你创建了一个 `Player.cs` 脚本。一开始，你可能觉得把所有逻辑都放在这里很方便：
 ```csharp
 // 一个承担大量职责的 “上帝类”
 public class Player : MonoBehaviour
 {
-    // 职责1: 玩家属性
-    public int health = 100;
-    public float speed = 5f;
-    public int score = 0;
+    // 职责 1: 玩家属性
+    private int health = 100;
+    private float speed = 5f;
+    private int score = 0;
 
-    // 职责2: 输入处理
-    void Update()
+    // 职责 2: 输入处理
+    private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.W)) {
-            // ...
+        if (Input.GetKeyDown(KeyCode.W)) 
+        {
+            //……
         }
-        if (Input.GetButtonDown("Fire1")) {
-            // ...
+
+        if (Input.GetButtonDown("Fire1")) 
+        {
+            //……
+            Fire();
         }
     }
 
-    // 职责3: 角色移动
-    void FixedUpdate()
+    // 职责 3: 角色移动
+    private void FixedUpdate()
     {
-        // ... 处理移动和物理 ...
+        // 处理移动和物理……
     }
 
-    // 职责4: 战斗逻辑
+    // 职责 4: 战斗逻辑
     public void TakeDamage(int amount)
     {
         health -= amount;
-        // ... 播放受伤动画和音效 ...
+        // 播放受伤动画和音效……
+
         if (health <= 0) {
             Die();
         }
     }
 
+    // 职责 5: 开火逻辑
     public void Fire() {
-        // ... 开火逻辑 ...
+        // 开火逻辑……
     }
 
-    // 职责5: 动画控制
+    // 职责 6: 动画控制
     public void UpdateAnimation() {
-        // ... 根据状态更新动画 ...
+        // 根据状态更新动画……
     }
 
-    // 职责6: 死亡处理
+    // 职责 7: 死亡处理
     private void Die() {
-        // ... 死亡逻辑，播放动画，显示UI ...
+        // 死亡逻辑、播放动画、显示UI……
     }
 
-    // 可能还有更多职责：音效、数据持久化、UI交互...
+    // 可能还有更多职责：音效、数据持久化、UI交互……
 }
 ```
-几千行的 `Player` 脚本会成为一场噩梦。当你只想修改 “开火” 逻辑时，却要在一大堆不相关的代码（如移动、动画、生命值）中寻找，非常困难且容易出错。
+几千行的 `Player.cs` 脚本会成为一场噩梦。当你只想修改 “开火” 逻辑时，却要在一大堆不相关的代码（如移动、动画、生命值）中寻找，非常困难且容易出错。
 
-假如你想创建一个同样可以移动和攻击，但不具备玩家得分和复杂动画的敌人，你几乎无法复用 `Player` 里的任何代码。你不得不复制粘贴，然后删改，这会导致代码冗余和新的维护问题。
+假如你想创建一个同样可以移动和攻击，但不具备玩家得分和复杂动画的敌人，你几乎无法复用 `Player.cs` 脚本里的任何代码。你不得不复制粘贴，然后删改，这会导致代码冗余和新的维护问题。
 
-对于上面那个臃肿的 `Player`，我们可以这样拆分：
-- `PlayerInput` 脚本负责监听输入。
-- `PlayerMovement` 脚本获取 `PlayerInput` 的输入来执行移动。
-- `PlayerCombat` 脚本处理攻击和战斗逻辑，并将战斗处理结果通过事件发送。
-- `PlayerAnimation` 脚本和 `PlayerAudio` 脚本通过 `PlayerCombat` 的事件处理动画状态和播放音效。
-- `PlayerHealth` 脚本管理生命值，并提供受伤和死亡的接口和事件。
+对于上面那个臃肿的 `Player.cs` 脚本，我们可以这样拆分：
+- `PlayerInput.cs` 脚本负责监听输入。
+- `PlayerMovement.cs` 脚本获取 `PlayerInput` 的输入来执行移动。
+- `PlayerCombat.cs` 脚本处理攻击和战斗逻辑，并将战斗处理结果通过事件发送。
+- `PlayerAnimation.cs` 脚本和 `PlayerAudio.cs` 脚本通过 `PlayerCombat` 的事件处理动画状态和播放音效。
+- `PlayerHealth.cs` 脚本管理生命值，并提供受伤和死亡的接口和事件。
 ## 变量
-使用变量来获取数值，而不是在代码中到处写入 “魔法值” 。
+使用变量来获取数值，而不是在代码中到处写入 “魔法值” 。“魔法值” 是指在代码中直接使用的、没有经过任何解释或命名的硬编码数值。
 
-简单来说，“魔法值” 是指在代码中直接使用的、没有经过任何解释或命名的硬编码数值。
-
-它就像一张来历不明的纸条，上面只写着一个数字 “7”。这个 “7” 是什么意思？是代表一周有 7 天？玩家最多能带 7 个道具？还是角色的攻击力是 7 ？没人知道。它就像魔法一样凭空出现，充满了神秘感，所以我们叫它 “魔法值” 。
+它就像一张来历不明的纸条，上面只写着一个数字 “7” 。这个 “7” 是什么意思？是代表一周有 7 天？玩家最多能带 7 个道具？还是角色的攻击力是 7 ？没人知道。它就像魔法一样凭空出现，充满了神秘感，所以我们叫它 “魔法值” 。
 
 这些是直接写在代码中的具体数值，没有用具名的常量或变量表示。虽然它们在短期内可能看起来方便，但在长期维护中往往会带来问题，因为数字的意义可能对阅读代码的人来说不清晰。例如：
 ```csharp
-// ❌ 充满魔法值的坏代码
+// 充满魔法值的代码
 public class PlayerController : MonoBehaviour
 {
     void Update()
@@ -317,34 +323,35 @@ public class PlayerController : MonoBehaviour
         // 这是什么？玩家移动速度？
         transform.Translate(Vector3.forward * 5.0f * Time.deltaTime);
 
+        // 20 又是什么？低血量警告阈值？
         if (health < 20)
         {
-            // 20 又是什么？低血量警告阈值？
             // 0.8f 是什么？低血量时的减速惩罚系数？
             speedModifier = 0.8f; 
         }
 
+        // 玩家状态 2 是什么？是 “跳跃中” 还是 “已阵亡” ？
         if (playerState == 2)
         {
-            // 2？！玩家状态 2 是什么？是 “跳跃中” 还是 “已阵亡” ？
-            // 这是最糟糕的一种魔法值！
+            // ……
         }
     }
 }
 ```
-这段代码里的 `5.0f`、`20`、`0.8f`、`2` 全是魔法值。对于一个不熟悉这段代码的人（甚至是你自己，一个月后再回来看），完全无法理解这些数字的业务含义，维护起来就是一场灾难。
+这段代码里的 `5.0f`、`20`、`0.8f` 和 `2` 全是魔法值。对于一个不熟悉这段代码的人（甚至是你自己一个月后再回来看），完全无法理解这些数字的业务含义，维护起来就是一场灾难。
 
-如果产品经理说：“我觉得玩家跑得太慢了，把速度从 `5.0f` 提升到 `5.5f` 吧。” 你需要做什么？你需要在整个项目中搜索所有写死的 `5.0f`，然后一个个判断哪个是代表玩家速度，哪个又可能是敌人的速度，或者是一个完全不相干的定时器时长。
+如果产品经理说：“我觉得玩家跑得太慢了，把速度从 `5.0f` 提升到 `5.5f` 吧。” 你需要做什么？你需要在整个项目中搜索所有写死的 `5.0f` ，然后一个个判断哪个是代表玩家速度，哪个又可能是敌人的速度，或者是一个完全不相干的定时器时长。
 
-如果一个数值在程序运行期间是绝对不会改变的，比如数学常数、转换因子等。使用 `const` 或 `static readonly`。
+如果一个数值在程序运行期间是绝对不会改变的，比如数学常数、转换因子等。使用 `const` 或 `static readonly` ：
 ```csharp
-// ✅ 正确做法
+// 定义一个常量
 public const float PI = 3.14159f;
-public static readonly Color WarningColor = Color.Yellow; // readonly 可以在构造时赋值
+// readonly 可以在构造时赋值
+public static readonly Color WarningColor = Color.Yellow; 
 ```
-对于代表 “状态” 的整数：使用 `enum`
+对于代表 “状态” 的整数，使用 `enum` ：
 ```csharp
-// ✅ 最佳实践：定义一个枚举
+// 定义一个枚举
 public enum PlayerState
 {
     Idle,      // 值为 0
@@ -356,24 +363,26 @@ public enum PlayerState
 // 在代码中使用，清晰、安全、易读
 if (currentState == PlayerState.Running)
 {
-    // ... 做奔跑相关的事
+    // 做奔跑相关的事……
 }
 ```
-需要动态修改的数值，将其序列化。
+需要动态修改的数值，将其序列化：
 ```csharp
-// ✅ Unity 的正确姿势
+// 添加 Serializable 特性
 [Serializable]
 public class PlayerSettings
 {
     [Header("Movement Settings")]
-    [Tooltip("玩家的基础移动速度")] // 加上 Tooltip，鼠标悬停有提示，非常专业
+    // 加上 Tooltip，鼠标悬停有提示
+    [Tooltip("玩家的基础移动速度")]
     [SerializeField] 
     private float moveSpeed = 5.0f;
 
     [Header("Health Settings")]
     [SerializeField] 
     private float lowHealthThreshold = 20f;
-    [Range(0, 1)] // 使用 Range 属性，可以在 Inspector 里拖动滑块，防止填错
+    // 使用 Range 属性，可以在 Inspector 里拖动滑块，防止填错
+    [Range(0, 1)]
     [SerializeField] 
     private float lowHealthSpeedModifier = 0.8f;
 }
@@ -402,7 +411,7 @@ public Level LoadLevel(int levelIndex);
 
 ![图片3](Images/Image_3.png)
 
-Unity 默认没有启用可空引用类型，需要在 c# 文件中添加编译指令 `#nullable enable` 或在项目文件夹下添加 Directory.Build.props 文件。
+Unity 默认没有启用可空引用类型，需要在 c# 文件中添加编译指令 `#nullable enable` 或在项目文件夹下添加 `Directory.Build.props` 文件。
 ```xml
 <Project>
   <PropertyGroup>
@@ -410,7 +419,7 @@ Unity 默认没有启用可空引用类型，需要在 c# 文件中添加编译�
   </PropertyGroup>
 </Project>
 ```
-c# 的 null 运算符（例如 `??`，`?.` ）只检查 c# 对象是否为 null。它无法调用 `UnityEngine.Object` 重载过的 `==` 和 `!=` 运算符。
+c# 的 null 运算符（例如 `??`，`?.` ）只检查 c# 对象是否为 null。它无法调用 `UnityEngine.Object` 重载过的 `==` 和 `!=` 运算符检查 native 对象。
 ```csharp
 public static bool operator ==(Object x, Object y) => Object.CompareBaseObjects(x, y);
 
@@ -422,36 +431,73 @@ public static bool operator !=(Object x, Object y) => !Object.CompareBaseObjects
 ## 格式化字符串
 c# 对字符串格式化时，默认会使用 `CultureInfo.CurrentCulture` 对不同的地区进行格式化（例如数字，时间和货币等）。
 
-当 `CurrentCulture` 发生变化时，相同的数字可能格式化成不同的字符串。
+当 `CurrentCulture` 发生变化时，相同的数字可能格式化成不同的字符串：
 ```csharp
-var number = 123.4;
-CultureInfo.CurrentCulture = new("fr-FR");
-var str = number.ToString();
-Console.WriteLine($"str: {str}"); // 输出为 123,4
+// 准备一个浮点数和一个日期
+float playerHealth = 98.6f;
+System.DateTime saveTime = System.DateTime.Now;
 
-CultureInfo.CurrentCulture = new("en-US");
-Console.WriteLine($"number: {double.Parse(str)}"); // 解析为 1234，与 number 的值不相等
+Debug.Log("====== 默认/当前区域性设置 (取决于操作系统) ======");
+// 在大多数中文或欧洲系统中，这里的输出会是本地化格式
+// 例如，如果系统是德语，下面的输出会使用逗号作为小数点
+string defaultHealthStr = playerHealth.ToString();
+string defaultTimeStr = saveTime.ToString();
+Debug.Log($"默认格式 - 生命值: {defaultHealthStr}");
+Debug.Log($"默认格式 - 保存时间: {defaultTimeStr}");
+Debug.Log("\n====== 模拟德国区域性设置 (de-DE) ======");
+// 强制将当前的区域性设置为德国（小数点用逗号）
+CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+string germanHealthStr = playerHealth.ToString();
+string germanTimeStr = saveTime.ToString();
+Debug.Log($"德国格式 (de-DE) - 生命值: {germanHealthStr}"); // 输出会是 98,6
+Debug.Log($"德国格式 (de-DE) - 保存时间: {germanTimeStr}"); // 日期格式会是 dd.MM.yyyy
+
+// 使用默认（可能是英语）区域性设置来解析
+float parsedHealth = float.Parse(germanHealthStr, CultureInfo.GetCultureInfo("en-US"));
+Debug.Log($"在美国 (en-US) 环境下解析 '{germanHealthStr}' 会得到: {parsedHealth}"); // 可能会解析成 986
+
+Debug.Log("\n====== 使用 InvariantCulture (推荐做法) ======");
+// 无论操作系统是什么设置，以下输出格式永远是固定的
+string invariantHealthStr = playerHealth.ToString(CultureInfo.InvariantCulture);
+string invariantTimeStr = saveTime.ToString(CultureInfo.InvariantCulture);
+Debug.Log($"固定格式 (InvariantCulture) - 生命值: {invariantHealthStr}"); // 永远是 98.6
+Debug.Log($"固定格式 (InvariantCulture) - 保存时间: {invariantTimeStr}"); // 永远是 MM/dd/yyyy HH:mm:ss
+
+// 使用 InvariantCulture 解析也总是可靠的
+float correctlyParsedHealth = float.Parse(invariantHealthStr, CultureInfo.InvariantCulture);
+Debug.Log($"使用 InvariantCulture 解析 '{invariantHealthStr}' 得到: {correctlyParsedHealth}"); // 永远正确解析为 98.6
 ```
-`CultureInfo.InvariantCulture` 是一个与地区无关的 `CultureInfo`。它提供了一套稳定、统一、可预测的格式，专门用于需要格式化和解析字符串的场景。
-```csharp
-CultureInfo.CurrentCulture = new("fr-FR");
-var str = number.ToString(CultureInfo.InvariantCulture);
-Console.WriteLine($"str: {str}"); // 输出为 123.4
+当你运行以上代码时，你会在 Unity 控制台中看到类似下面的输出（具体日期时间会变化）：
+```
+====== 默认/当前区域性设置 (取决于操作系统) ======
+默认格式 - 生命值: 98.6
+默认格式 - 保存时间: 6/22/2025 10:10:20 AM
 
-CultureInfo.CurrentCulture = new("en-US");
-Console.WriteLine($"number: {double.Parse(str, CultureInfo.InvariantCulture)}"); // 解析为 123.4，与 number 的值相等
+====== 模拟德国区域性设置 (de-DE) ======
+德国格式 (de-DE) - 生命值: 98,6
+德国格式 (de-DE) - 保存时间: 22.06.2025 10:10:20
+在美国 (en-US) 环境下解析 '98,6' 会得到: 986
+
+====== 使用 InvariantCulture (推荐做法) ======
+固定格式 (InvariantCulture) - 生命值: 98.6
+固定格式 (InvariantCulture) - 保存时间: 06/22/2025 10:10:20
+使用 InvariantCulture 解析 '98.6' 得到: 98.6
+```
+从输出可以清晰地看到在模拟的德国环境下，`98.6f` 变成了 `98,6` 。如果这个字符串被保存，其他地区的玩家加载时，`float.Parse("98,6")` 如果不指定 `CultureInfo` ，很可能会失败或解析成 986。使用 `CultureInfo.InvariantCulture` 生成的字符串 "98.6" 始终保持一致，可以被任何系统安全地解析。
+
+`CultureInfo.InvariantCulture` 是一个与地区无关的 `CultureInfo`。它提供了一套统一、可预测的格式，专门用于需要格式化和解析字符串的场景。
+
+只有当你要在 UI 上向玩家显示数字或日期，并且希望这些信息本地化以符合玩家的习惯时，才应该使用默认的 `CultureInfo.CurrentCulture` 或指定的区域性设置。
+
+```csharp
+// 用于 UI 显示，可以本地化
+myTextComponent.text = $"得分: {score}"; // 使用系统默认格式
 ```
 ## 条件编译
 条件编译允许你告诉编译器在编译代码时，根据你设定的条件，只包含或排除某些代码块。
 
-你可以把它想象成一份有多项选择的 “构建说明书” 。例如，这份说明书上写着：
-- 如果目标是手机，就加入 “触摸屏操作” 这段代码。
-- 如果目标是 PC，就加入 “键鼠操作” 这段代码。
-- 如果是在 Unity 编辑器里，就加入 “调试工具” 这段代码，但最终打包时不要加进去。
-
-这样一来，你最终得到的应用程序（.apk，.exe）会非常 “干净”，只包含它在该平台上真正需要的代码，减小了包体大小，也避免了在不兼容的平台上执行错误的代码。
-
-它的核心语法是使用 C# 的预处理指令，主要是：`#if`， `#elif`，`#else` 和 `#endif`。
+它的核心语法是使用 C# 的预处理指令，主要是：`#if` 、`#elif` 、`#else` 和 `#endif` 。
 
 一个最基础的例子：
 ```csharp
@@ -469,6 +515,8 @@ void Update()
 #endif
 }
 ```
+这样一来，你最终得到的应用程序（.apk，.exe）会非常 “干净”，只包含它在该平台上真正需要的代码，减小了包体大小，也避免了在不兼容的平台上执行错误的代码。
+
 另一个至关重要的用途，很多代码只是为了方便编辑器开发和调试，不应该被打包到最终发布的游戏中：
 ```csharp
 void Update()
@@ -493,32 +541,24 @@ void Update()
     #if TEST_VERSION
         ShowTestUI();
     #endif
-        // ... 正常的功能代码 ...
+        // 正常的功能代码……
     }
     ```
 也可以使用脚本调用 `PlayerSettings.SetScriptingDefineSymbols` 实现自动化设置。
 
-使用 `const bool` 区分版本无法保证不使用的代码被完全排除（例如某些库在特定平台无法编译），也不方便自动化设置版本。
+不使用 `const bool` 字段区分版本，它无法保证不使用的代码被完全排除（例如某些库在特定平台无法编译），也不方便自动化设置版本。
 ## 包管理
-优先考虑使用 UPM（ Unity Package Manager ） 而不是 .unitypackage 文件（并不是所有库与插件都支持 UPM ）。
+优先考虑使用 UPM（ Unity Package Manager ） 而不是 `.unitypackage` 文件（并不是所有库与插件都支持 UPM ）。
 
-Unity 常用的包是 .unitypackage 文件，其本质上就是一个压缩包（类似 .zip）。你把一堆 Assets（脚本、模型、贴图、预制体……）打包进去，然后拿到另一个项目里解压。
+Unity 常用的包是 `.unitypackage` 文件，其本质上就是一个压缩包（类似 `.zip` ）。你把一堆 Assets（脚本、模型、贴图、预制体……）打包进去，然后拿到另一个项目里解压。所有导入的资源都变成了你 Assets 文件夹下的实体文件。第三方库、插件、美术资源……所有东西都混在一起，提交到你的 Git 仓库里。你的仓库会变得异常庞大，clone 和 pull 的速度慢如蜗牛。
 
-所有导入的资源都变成了你 Assets 文件夹下的实体文件。第三方库、插件、美术资源……所有东西都混在一起，提交到你的 Git 或 SVN 仓库里。你的仓库会变得异常庞大，clone 和 pull 的速度慢如蜗牛。
+如何知道导入的 `MyAwesomeTool.unitypackage` 是 `1.0` 版本还是 `1.1` 版本？如果发布了新版，需要先手动删除旧的文件（天知道会不会删错或删漏），再导入新的。这极易出错，导致项目混乱。你无法一目了然地看到项目里有哪些第三方包，哪些版本过时了需要更新。一切都得靠手动管理和人脑记忆。
 
-如何知道导入的 MyAwesomeTool.unitypackage 是 1.0 版本还是 1.1 版本？如果发布了新版，需要先手动删除旧的文件（天知道会不会删错或删漏），再导入新的。这极易出错，导致项目混乱。
-
-你无法一目了然地看到项目里有哪些第三方包，哪些版本过时了需要更新。一切都得靠手动管理和人脑记忆。
-
-UPM 是一个依赖管理系统，如果你用过前端的 npm、Java 的 Maven 或者 .NET 的 NuGet，你会感到非常亲切。UPM 就是 Unity 世界里的 npm。
-
-在 Packages 文件夹里有一个核心文件：manifest.json。这个文件就像你的借书卡，它用文本清晰地记录了：“我的项目需要以下这些包，以及它们的指定版本号。”
-
-除了从官方或私有仓库下载，UPM 还支持直接从 Git URL、甚至是本地文件夹加载包。这意味着你可以把公司的通用模块做成一个 Git 仓库，在多个项目中直接引用。
+UPM 是一个依赖管理系统，在 `Packages` 文件夹里有一个核心文件：`manifest.json` 。它用文本清晰地记录了：“我的项目需要以下这些包，以及它们的指定版本号。” 除了从官方或私有仓库下载，UPM 还支持直接从 Git URL、甚至是本地文件夹加载包。这意味着你可以把公司的通用模块做成一个 Git 仓库，在多个项目中直接引用。
 
 OpenUPM 是一个由社区驱动的、开放的、免费的 UPM 软件包仓库。它收录了大量官方仓库里没有的优秀开源包，并允许你用标准的 UPM 工作流来安装和管理它们。
 
-通过 npm 安装 openupm-cli 后在项目根目录执行以下命令即可安装包（例如 External Dependency Manager for Unity ）：
+通过 `npm` 安装 `openupm-cli` 后在项目根目录执行以下命令即可安装包（例如 External Dependency Manager for Unity ）：
 ```
 openupm add com.google.external-dependency-manager
 ```
@@ -527,9 +567,9 @@ openupm add com.google.external-dependency-manager
 openupm add morelinq
 ```
 ## 编辑器拓展
-Odin Inspector，Odin Serializer 和 Odin Validator 是 Unity 插件，它们可以快速实现 Unity 编辑器功能扩展
+Odin Inspector，Odin Serializer 和 Odin Validator 是可以快速实现 Unity 编辑器功能拓展的插件。
 
-使用 Odin Inspector，你不再需要创建 Editor 文件夹和编写 `CustomEditor` 脚本。你只需要在你的 `MonoBehaviour` 或 `ScriptableObject` 脚本里，给字段、属性或方法加上 `[Attribute]` 即可。这让你的运行时代码和编辑器代码高度统一，维护起来极其方便。
+使用 Odin Inspector，你不再需要创建 `Editor` 文件夹和编写 `CustomEditor` 脚本。你只需要在你的 `MonoBehaviour` 或 `ScriptableObject` 脚本里，给字段、属性或方法加上 `[Attribute]` 即可。这让你的运行时代码和编辑器代码高度统一，维护起来极其方便。
 ```csharp
 [Title("测试工具")]
 [Button(ButtonSizes.Large, Name = "一键满血满蓝")] // 创建一个大按钮
